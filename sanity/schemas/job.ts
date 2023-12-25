@@ -1,11 +1,9 @@
-import { Briefcase } from "lucide-react";
-import {defineField, defineType} from 'sanity'
+import {defineType} from 'sanity'
 
 export default defineType({
   name: "job",
   title: "Job",
   type: "document",
-  icon: Briefcase,
   fields: [
     {
       name: "name",

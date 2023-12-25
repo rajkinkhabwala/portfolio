@@ -1,11 +1,10 @@
+import { UserIcon } from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
-import { UserRoundCog } from 'lucide-react'
 
-export default defineType({
+const profile = {
   name: "profile",
   title: "Profile",
   type: "document",
-  icon: UserRoundCog,
   fields: [
     defineField({
       name: "fullName",
@@ -106,4 +105,6 @@ export default defineType({
       of: [{ type: "string" }],
     },
   ],
-})
+}
+
+export default profile
