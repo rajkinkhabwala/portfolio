@@ -10,8 +10,7 @@ export default async function Hero(){
   
 
     return(
-        <section className="relative isolate w-full h-screen flex justify-center items-center -mt-16">
-        <MaxWidthWapper>
+        <>
           { profile ? 
           profile.map((data) => (
             <div key={data._id} className="mx-auto max-w-2xl sm:py-48">
@@ -68,7 +67,6 @@ export default async function Hero(){
          </div>
             }
             
-        </MaxWidthWapper>
-        </section>
+       </>
     )
 }
