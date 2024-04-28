@@ -1,35 +1,5 @@
 const ASTRO_VERSION = "4.7.0";
-const REROUTE_DIRECTIVE_HEADER = "X-Astro-Reroute";
-const ROUTE_TYPE_HEADER = "X-Astro-Route-Type";
-const DEFAULT_404_COMPONENT = "astro-default-404";
-const REROUTABLE_STATUS_CODES = [404, 500];
-const clientAddressSymbol = Symbol.for("astro.clientAddress");
-const clientLocalsSymbol = Symbol.for("astro.locals");
-const responseSentSymbol = Symbol.for("astro.responseSent");
 
-const ClientAddressNotAvailable = {
-  name: "ClientAddressNotAvailable",
-  title: "`Astro.clientAddress` is not available in current adapter.",
-  message: (adapterName) => `\`Astro.clientAddress\` is not available in the \`${adapterName}\` adapter. File an issue with the adapter to add support.`
-};
-const StaticClientAddressNotAvailable = {
-  name: "StaticClientAddressNotAvailable",
-  title: "`Astro.clientAddress` is not available in static mode.",
-  message: "`Astro.clientAddress` is only available when using `output: 'server'` or `output: 'hybrid'`. Update your Astro config if you need SSR features.",
-  hint: "See https://docs.astro.build/en/guides/server-side-rendering/ for more information on how to enable SSR."
-};
-const NoMatchingStaticPathFound = {
-  name: "NoMatchingStaticPathFound",
-  title: "No static path found for requested path.",
-  message: (pathName) => `A \`getStaticPaths()\` route pattern was matched, but no matching static path was found for requested path \`${pathName}\`.`,
-  hint: (possibleRoutes) => `Possible dynamic routes being matched: ${possibleRoutes.join(", ")}.`
-};
-const OnlyResponseCanBeReturned = {
-  name: "OnlyResponseCanBeReturned",
-  title: "Invalid type returned by Astro page.",
-  message: (route, returnedValue) => `Route \`${route ? route : ""}\` returned a \`${returnedValue}\`. Only a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) can be returned from Astro files.`,
-  hint: "See https://docs.astro.build/en/guides/server-side-rendering/#response for more information."
-};
 const MissingMediaQueryDirective = {
   name: "MissingMediaQueryDirective",
   title: "Missing value for `client:media` directive.",
@@ -58,44 +28,6 @@ const NoClientOnlyHint = {
   message: (componentName) => `Unable to render \`${componentName}\`. When using the \`client:only\` hydration strategy, Astro needs a hint to use the correct renderer.`,
   hint: (probableRenderers) => `Did you mean to pass \`client:only="${probableRenderers}"\`? See https://docs.astro.build/en/reference/directives-reference/#clientonly for more information on client:only`
 };
-const InvalidGetStaticPathsEntry = {
-  name: "InvalidGetStaticPathsEntry",
-  title: "Invalid entry inside getStaticPath's return value",
-  message: (entryType) => `Invalid entry returned by getStaticPaths. Expected an object, got \`${entryType}\``,
-  hint: "If you're using a `.map` call, you might be looking for `.flatMap()` instead. See https://docs.astro.build/en/reference/api-reference/#getstaticpaths for more information on getStaticPaths."
-};
-const InvalidGetStaticPathsReturn = {
-  name: "InvalidGetStaticPathsReturn",
-  title: "Invalid value returned by getStaticPaths.",
-  message: (returnType) => `Invalid type returned by \`getStaticPaths\`. Expected an \`array\`, got \`${returnType}\``,
-  hint: "See https://docs.astro.build/en/reference/api-reference/#getstaticpaths for more information on getStaticPaths."
-};
-const GetStaticPathsExpectedParams = {
-  name: "GetStaticPathsExpectedParams",
-  title: "Missing params property on `getStaticPaths` route.",
-  message: "Missing or empty required `params` property on `getStaticPaths` route.",
-  hint: "See https://docs.astro.build/en/reference/api-reference/#getstaticpaths for more information on getStaticPaths."
-};
-const GetStaticPathsInvalidRouteParam = {
-  name: "GetStaticPathsInvalidRouteParam",
-  title: "Invalid value for `getStaticPaths` route parameter.",
-  message: (key, value, valueType) => `Invalid getStaticPaths route parameter for \`${key}\`. Expected undefined, a string or a number, received \`${valueType}\` (\`${value}\`)`,
-  hint: "See https://docs.astro.build/en/reference/api-reference/#getstaticpaths for more information on getStaticPaths."
-};
-const GetStaticPathsRequired = {
-  name: "GetStaticPathsRequired",
-  title: "`getStaticPaths()` function required for dynamic routes.",
-  message: "`getStaticPaths()` function is required for dynamic routes. Make sure that you `export` a `getStaticPaths` function from your dynamic route.",
-  hint: `See https://docs.astro.build/en/guides/routing/#dynamic-routes for more information on dynamic routes.
-
-Alternatively, set \`output: "server"\` or \`output: "hybrid"\` in your Astro config file to switch to a non-static server build. This error can also occur if using \`export const prerender = true;\`.
-See https://docs.astro.build/en/guides/server-side-rendering/ for more information on non-static rendering.`
-};
-const ReservedSlotName = {
-  name: "ReservedSlotName",
-  title: "Invalid slot name.",
-  message: (slotName) => `Unable to create a slot named \`${slotName}\`. \`${slotName}\` is a reserved slot name. Please update the name of this slot.`
-};
 const NoMatchingImport = {
   name: "NoMatchingImport",
   title: "No import found for component.",
@@ -108,111 +40,6 @@ const InvalidComponentArgs = {
   message: (name) => `Invalid arguments passed to${name ? ` <${name}>` : ""} component.`,
   hint: "Astro components cannot be rendered directly via function call, such as `Component()` or `{items.map(Component)}`."
 };
-const PageNumberParamNotFound = {
-  name: "PageNumberParamNotFound",
-  title: "Page number param not found.",
-  message: (paramName) => `[paginate()] page number param \`${paramName}\` not found in your filepath.`,
-  hint: "Rename your file to `[page].astro` or `[...page].astro`."
-};
-const ImageMissingAlt = {
-  name: "ImageMissingAlt",
-  title: 'Image missing required "alt" property.',
-  message: 'Image missing "alt" property. "alt" text is required to describe important images on the page.',
-  hint: 'Use an empty string ("") for decorative images.'
-};
-const InvalidImageService = {
-  name: "InvalidImageService",
-  title: "Error while loading image service.",
-  message: "There was an error loading the configured image service. Please see the stack trace for more information."
-};
-const MissingImageDimension = {
-  name: "MissingImageDimension",
-  title: "Missing image dimensions",
-  message: (missingDimension, imageURL) => `Missing ${missingDimension === "both" ? "width and height attributes" : `${missingDimension} attribute`} for ${imageURL}. When using remote images, both dimensions are required unless in order to avoid CLS.`,
-  hint: "If your image is inside your `src` folder, you probably meant to import it instead. See [the Imports guide for more information](https://docs.astro.build/en/guides/imports/#other-assets). You can also use `inferSize={true}` for remote images to get the original dimensions."
-};
-const FailedToFetchRemoteImageDimensions = {
-  name: "FailedToFetchRemoteImageDimensions",
-  title: "Failed to retrieve remote image dimensions",
-  message: (imageURL) => `Failed to get the dimensions for ${imageURL}.`,
-  hint: "Verify your remote image URL is accurate, and that you are not using `inferSize` with a file located in your `public/` folder."
-};
-const UnsupportedImageFormat = {
-  name: "UnsupportedImageFormat",
-  title: "Unsupported image format",
-  message: (format, imagePath, supportedFormats) => `Received unsupported format \`${format}\` from \`${imagePath}\`. Currently only ${supportedFormats.join(
-    ", "
-  )} are supported by our image services.`,
-  hint: "Using an `img` tag directly instead of the `Image` component might be what you're looking for."
-};
-const UnsupportedImageConversion = {
-  name: "UnsupportedImageConversion",
-  title: "Unsupported image conversion",
-  message: "Converting between vector (such as SVGs) and raster (such as PNGs and JPEGs) images is not currently supported."
-};
-const PrerenderDynamicEndpointPathCollide = {
-  name: "PrerenderDynamicEndpointPathCollide",
-  title: "Prerendered dynamic endpoint has path collision.",
-  message: (pathname) => `Could not render \`${pathname}\` with an \`undefined\` param as the generated path will collide during prerendering. Prevent passing \`undefined\` as \`params\` for the endpoint's \`getStaticPaths()\` function, or add an additional extension to the endpoint's filename.`,
-  hint: (filename) => `Rename \`${filename}\` to \`${filename.replace(/\.(?:js|ts)/, (m) => `.json` + m)}\``
-};
-const ExpectedImage = {
-  name: "ExpectedImage",
-  title: "Expected src to be an image.",
-  message: (src, typeofOptions, fullOptions) => `Expected \`src\` property for \`getImage\` or \`<Image />\` to be either an ESM imported image or a string with the path of a remote image. Received \`${src}\` (type: \`${typeofOptions}\`).
-
-Full serialized options received: \`${fullOptions}\`.`,
-  hint: "This error can often happen because of a wrong path. Make sure the path to your image is correct. If you're passing an async function, make sure to call and await it."
-};
-const ExpectedImageOptions = {
-  name: "ExpectedImageOptions",
-  title: "Expected image options.",
-  message: (options) => `Expected getImage() parameter to be an object. Received \`${options}\`.`
-};
-const IncompatibleDescriptorOptions = {
-  name: "IncompatibleDescriptorOptions",
-  title: "Cannot set both `densities` and `widths`",
-  message: "Only one of `densities` or `widths` can be specified. In most cases, you'll probably want to use only `widths` if you require specific widths.",
-  hint: "Those attributes are used to construct a `srcset` attribute, which cannot have both `x` and `w` descriptors."
-};
-const ResponseSentError = {
-  name: "ResponseSentError",
-  title: "Unable to set response.",
-  message: "The response has already been sent to the browser and cannot be altered."
-};
-const MiddlewareNoDataOrNextCalled = {
-  name: "MiddlewareNoDataOrNextCalled",
-  title: "The middleware didn't return a `Response`.",
-  message: "Make sure your middleware returns a `Response` object, either directly or by returning the `Response` from calling the `next` function."
-};
-const MiddlewareNotAResponse = {
-  name: "MiddlewareNotAResponse",
-  title: "The middleware returned something that is not a `Response` object.",
-  message: "Any data returned from middleware must be a valid `Response` object."
-};
-const EndpointDidNotReturnAResponse = {
-  name: "EndpointDidNotReturnAResponse",
-  title: "The endpoint did not return a `Response`.",
-  message: "An endpoint must return either a `Response`, or a `Promise` that resolves with a `Response`."
-};
-const LocalsNotAnObject = {
-  name: "LocalsNotAnObject",
-  title: "Value assigned to `locals` is not accepted.",
-  message: "`locals` can only be assigned to an object. Other values like numbers, strings, etc. are not accepted.",
-  hint: "If you tried to remove some information from the `locals` object, try to use `delete` or set the property to `undefined`."
-};
-const AstroResponseHeadersReassigned = {
-  name: "AstroResponseHeadersReassigned",
-  title: "`Astro.response.headers` must not be reassigned.",
-  message: "Individual headers can be added to and removed from `Astro.response.headers`, but it must not be replaced with another instance of `Headers` altogether.",
-  hint: "Consider using `Astro.response.headers.add()`, and `Astro.response.headers.delete()`."
-};
-const LocalImageUsedWrongly = {
-  name: "LocalImageUsedWrongly",
-  title: "Local images must be imported.",
-  message: (imageFilePath) => `\`Image\`'s and \`getImage\`'s \`src\` parameter must be an imported image or an URL, it cannot be a string filepath. Received \`${imageFilePath}\`.`,
-  hint: "If you want to use an image from your `src` folder, you need to either import it or if the image is coming from a content collection, use the [image() schema helper](https://docs.astro.build/en/guides/images/#images-in-content-collections). See https://docs.astro.build/en/guides/images/#src-required for more information on the `src` property."
-};
 const AstroGlobUsedOutside = {
   name: "AstroGlobUsedOutside",
   title: "Astro.glob() used outside of an Astro file.",
@@ -224,12 +51,6 @@ const AstroGlobNoMatch = {
   title: "Astro.glob() did not match any files.",
   message: (globStr) => `\`Astro.glob(${globStr})\` did not return any matching files.`,
   hint: "Check the pattern for typos."
-};
-const MissingSharp = {
-  name: "MissingSharp",
-  title: "Could not find Sharp.",
-  message: "Could not find Sharp. Please install Sharp (`sharp`) manually into your project or migrate to another image service.",
-  hint: "See Sharp's installation instructions for more information: https://sharp.pixelplumbing.com/install. If you are not relying on `astro:assets` to optimize, transform, or process any images, you can configure a passthrough image service instead of installing Sharp. See https://docs.astro.build/en/reference/errors/missing-sharp for more information.\n\nSee https://docs.astro.build/en/guides/images/#default-image-service for more information on how to migrate to another image service."
 };
 
 function normalizeLF(code) {
@@ -305,72 +126,9 @@ class AstroError extends Error {
   }
 }
 
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-let FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM, isTTY=true;
 if (typeof process !== 'undefined') {
-	({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env || {});
-	isTTY = process.stdout && process.stdout.isTTY;
-}
-
-const $ = {
-	enabled: !NODE_DISABLE_COLORS && NO_COLOR == null && TERM !== 'dumb' && (
-		FORCE_COLOR != null && FORCE_COLOR !== '0' || isTTY
-	)
-};
-
-function init(x, y) {
-	let rgx = new RegExp(`\\x1b\\[${y}m`, 'g');
-	let open = `\x1b[${x}m`, close = `\x1b[${y}m`;
-
-	return function (txt) {
-		if (!$.enabled || txt == null) return txt;
-		return open + (!!~(''+txt).indexOf(close) ? txt.replace(rgx, close + open) : txt) + close;
-	};
-}
-const bold = init(1, 22);
-const dim = init(2, 22);
-const red = init(31, 39);
-const yellow = init(33, 39);
-const blue = init(34, 39);
-
-async function renderEndpoint(mod, context, ssr, logger) {
-  const { request, url } = context;
-  const method = request.method.toUpperCase();
-  const handler = mod[method] ?? mod["ALL"];
-  if (!ssr && ssr === false && method !== "GET") {
-    logger.warn(
-      "router",
-      `${url.pathname} ${bold(
-        method
-      )} requests are not available for a static site. Update your config to \`output: 'server'\` or \`output: 'hybrid'\` to enable.`
-    );
-  }
-  if (handler === void 0) {
-    logger.warn(
-      "router",
-      `No API Route handler exists for the method "${method}" for the route "${url.pathname}".
-Found handlers: ${Object.keys(mod).map((exp) => JSON.stringify(exp)).join(", ")}
-` + ("all" in mod ? `One of the exported handlers is "all" (lowercase), did you mean to export 'ALL'?
-` : "")
-    );
-    return new Response(null, { status: 404 });
-  }
-  if (typeof handler !== "function") {
-    logger.error(
-      "router",
-      `The route "${url.pathname}" exports a value for the method "${method}", but it is of the type ${typeof handler} instead of a function.`
-    );
-    return new Response(null, { status: 500 });
-  }
-  const response = await handler.call(mod, context);
-  if (!response || response instanceof Response === false) {
-    throw new AstroError(EndpointDidNotReturnAResponse);
-  }
-  if (REROUTABLE_STATUS_CODES.includes(response.status)) {
-    response.headers.set(REROUTE_DIRECTIVE_HEADER, "no");
-  }
-  return response;
+	(process.env || {});
+	process.stdout && process.stdout.isTTY;
 }
 
 function validateArgs(args) {
@@ -502,11 +260,6 @@ const markHTMLString = (value) => {
 };
 function isHTMLString(value) {
   return Object.prototype.toString.call(value) === "[object HTMLString]";
-}
-
-const AstroJSX = "astro:jsx";
-function isVNode(vnode) {
-  return vnode && typeof vnode === "object" && vnode[AstroJSX];
 }
 
 const RenderInstructionSymbol = Symbol.for("astro:render");
@@ -927,7 +680,7 @@ function internalSpreadAttributes(values, shouldEscape = true) {
   }
   return markHTMLString(output);
 }
-function renderElement$1(name, { props: _props, children = "" }, shouldEscape = true) {
+function renderElement(name, { props: _props, children = "" }, shouldEscape = true) {
   const { lang: _, "data-astro-id": astroId, "define:vars": defineVars, ...props } = _props;
   if (defineVars) {
     if (name === "style") {
@@ -973,20 +726,7 @@ function renderToBufferDestination(bufferRenderFunction) {
   const renderer = new BufferedRenderer(bufferRenderFunction);
   return renderer;
 }
-const isNode = typeof process !== "undefined" && Object.prototype.toString.call(process) === "[object process]";
-const isDeno = typeof Deno !== "undefined";
-function promiseWithResolvers() {
-  let resolve, reject;
-  const promise = new Promise((_resolve, _reject) => {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  return {
-    promise,
-    resolve,
-    reject
-  };
-}
+typeof process !== "undefined" && Object.prototype.toString.call(process) === "[object process]";
 const VALID_PROTOCOLS = ["http:", "https:"];
 function isHttpUrl(url) {
   try {
@@ -1005,13 +745,13 @@ const uniqueElements = (item, index, all) => {
 function renderAllHeadContent(result) {
   result._metadata.hasRenderedHead = true;
   const styles = Array.from(result.styles).filter(uniqueElements).map(
-    (style) => style.props.rel === "stylesheet" ? renderElement$1("link", style) : renderElement$1("style", style)
+    (style) => style.props.rel === "stylesheet" ? renderElement("link", style) : renderElement("style", style)
   );
   result.styles.clear();
   const scripts = Array.from(result.scripts).filter(uniqueElements).map((script) => {
-    return renderElement$1("script", script, false);
+    return renderElement("script", script, false);
   });
-  const links = Array.from(result.links).filter(uniqueElements).map((link) => renderElement$1("link", link, false));
+  const links = Array.from(result.links).filter(uniqueElements).map((link) => renderElement("link", link, false));
   let content = styles.join("\n") + links.join("\n") + scripts.join("\n");
   if (result._metadata.extraHead.length > 0) {
     for (const part of result._metadata.extraHead) {
@@ -1100,7 +840,7 @@ async function renderSlots(result, slots = {}) {
 
 const Fragment = Symbol.for("astro:fragment");
 const Renderer = Symbol.for("astro:renderer");
-const encoder = new TextEncoder();
+new TextEncoder();
 const decoder = new TextDecoder();
 function stringifyChunk(result, chunk) {
   if (isRenderInstruction(chunk)) {
@@ -1163,14 +903,6 @@ function chunkToString(result, chunk) {
     return decoder.decode(chunk);
   } else {
     return stringifyChunk(result, chunk);
-  }
-}
-function chunkToByteArray(result, chunk) {
-  if (ArrayBuffer.isView(chunk)) {
-    return chunk;
-  } else {
-    const stringified = stringifyChunk(result, chunk);
-    return encoder.encode(stringified.toString());
   }
 }
 function isRenderInstance(obj) {
@@ -1332,203 +1064,6 @@ function renderTemplate(htmlParts, ...expressions) {
   return new RenderTemplateResult(htmlParts, expressions);
 }
 
-const DOCTYPE_EXP = /<!doctype html/i;
-async function renderToString(result, componentFactory, props, children, isPage = false, route) {
-  const templateResult = await callComponentAsTemplateResultOrResponse(
-    result,
-    componentFactory,
-    props,
-    children,
-    route
-  );
-  if (templateResult instanceof Response)
-    return templateResult;
-  let str = "";
-  let renderedFirstPageChunk = false;
-  if (isPage) {
-    await bufferHeadContent(result);
-  }
-  const destination = {
-    write(chunk) {
-      if (isPage && !renderedFirstPageChunk) {
-        renderedFirstPageChunk = true;
-        if (!result.partial && !DOCTYPE_EXP.test(String(chunk))) {
-          const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-          str += doctype;
-        }
-      }
-      if (chunk instanceof Response)
-        return;
-      str += chunkToString(result, chunk);
-    }
-  };
-  await templateResult.render(destination);
-  return str;
-}
-async function renderToReadableStream(result, componentFactory, props, children, isPage = false, route) {
-  const templateResult = await callComponentAsTemplateResultOrResponse(
-    result,
-    componentFactory,
-    props,
-    children,
-    route
-  );
-  if (templateResult instanceof Response)
-    return templateResult;
-  let renderedFirstPageChunk = false;
-  if (isPage) {
-    await bufferHeadContent(result);
-  }
-  return new ReadableStream({
-    start(controller) {
-      const destination = {
-        write(chunk) {
-          if (isPage && !renderedFirstPageChunk) {
-            renderedFirstPageChunk = true;
-            if (!result.partial && !DOCTYPE_EXP.test(String(chunk))) {
-              const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-              controller.enqueue(encoder.encode(doctype));
-            }
-          }
-          if (chunk instanceof Response) {
-            throw new AstroError({
-              ...ResponseSentError
-            });
-          }
-          const bytes = chunkToByteArray(result, chunk);
-          controller.enqueue(bytes);
-        }
-      };
-      (async () => {
-        try {
-          await templateResult.render(destination);
-          controller.close();
-        } catch (e) {
-          if (AstroError.is(e) && !e.loc) {
-            e.setLocation({
-              file: route?.component
-            });
-          }
-          setTimeout(() => controller.error(e), 0);
-        }
-      })();
-    },
-    cancel() {
-      result.cancelled = true;
-    }
-  });
-}
-async function callComponentAsTemplateResultOrResponse(result, componentFactory, props, children, route) {
-  const factoryResult = await componentFactory(result, props, children);
-  if (factoryResult instanceof Response) {
-    return factoryResult;
-  } else if (!isRenderTemplateResult(factoryResult)) {
-    throw new AstroError({
-      ...OnlyResponseCanBeReturned,
-      message: OnlyResponseCanBeReturned.message(route?.route, typeof factoryResult),
-      location: {
-        file: route?.component
-      }
-    });
-  }
-  return isHeadAndContent(factoryResult) ? factoryResult.content : factoryResult;
-}
-async function bufferHeadContent(result) {
-  const iterator = result._metadata.propagators.values();
-  while (true) {
-    const { value, done } = iterator.next();
-    if (done) {
-      break;
-    }
-    const returnValue = await value.init(result);
-    if (isHeadAndContent(returnValue)) {
-      result._metadata.extraHead.push(returnValue.head);
-    }
-  }
-}
-async function renderToAsyncIterable(result, componentFactory, props, children, isPage = false, route) {
-  const templateResult = await callComponentAsTemplateResultOrResponse(
-    result,
-    componentFactory,
-    props,
-    children,
-    route
-  );
-  if (templateResult instanceof Response)
-    return templateResult;
-  let renderedFirstPageChunk = false;
-  if (isPage) {
-    await bufferHeadContent(result);
-  }
-  let error = null;
-  let next = promiseWithResolvers();
-  const buffer = [];
-  const iterator = {
-    async next() {
-      if (result.cancelled)
-        return { done: true, value: void 0 };
-      await next.promise;
-      if (error) {
-        throw error;
-      }
-      let length = 0;
-      for (let i = 0, len = buffer.length; i < len; i++) {
-        length += buffer[i].length;
-      }
-      let mergedArray = new Uint8Array(length);
-      let offset = 0;
-      for (let i = 0, len = buffer.length; i < len; i++) {
-        const item = buffer[i];
-        mergedArray.set(item, offset);
-        offset += item.length;
-      }
-      buffer.length = 0;
-      const returnValue = {
-        // The iterator is done if there are no chunks to return.
-        done: length === 0,
-        value: mergedArray
-      };
-      return returnValue;
-    },
-    async return() {
-      result.cancelled = true;
-      return { done: true, value: void 0 };
-    }
-  };
-  const destination = {
-    write(chunk) {
-      if (isPage && !renderedFirstPageChunk) {
-        renderedFirstPageChunk = true;
-        if (!result.partial && !DOCTYPE_EXP.test(String(chunk))) {
-          const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-          buffer.push(encoder.encode(doctype));
-        }
-      }
-      if (chunk instanceof Response) {
-        throw new AstroError(ResponseSentError);
-      }
-      const bytes = chunkToByteArray(result, chunk);
-      if (bytes.length > 0) {
-        buffer.push(bytes);
-        next.resolve();
-        next = promiseWithResolvers();
-      }
-    }
-  };
-  const renderPromise = templateResult.render(destination);
-  renderPromise.then(() => {
-    next.resolve();
-  }).catch((err) => {
-    error = err;
-    next.resolve();
-  });
-  return {
-    [Symbol.asyncIterator]() {
-      return iterator;
-    }
-  };
-}
-
 function componentIsHTMLElement(Component) {
   return typeof HTMLElement !== "undefined" && HTMLElement.isPrototypeOf(Component);
 }
@@ -1550,7 +1085,6 @@ function getHTMLElementName(constructor) {
   return assignedName;
 }
 
-const needsHeadRenderingSymbol = Symbol.for("astro.needsHeadRendering");
 const rendererAliases = /* @__PURE__ */ new Map([["solid", "solid-js"]]);
 const clientOnlyValues = /* @__PURE__ */ new Set(["solid-js", "react", "preact", "vue", "svelte", "lit"]);
 function guessRenderers(componentUrl) {
@@ -1861,7 +1395,7 @@ ${serializeProps(
           })
         );
       }
-      const renderedElement = renderElement$1("astro-island", island, false);
+      const renderedElement = renderElement("astro-island", island, false);
       destination.write(markHTMLString(renderedElement));
     }
   };
@@ -1935,263 +1469,8 @@ function normalizeProps(props) {
   }
   return props;
 }
-async function renderComponentToString(result, displayName, Component, props, slots = {}, isPage = false, route) {
-  let str = "";
-  let renderedFirstPageChunk = false;
-  let head = "";
-  if (isPage && !result.partial && nonAstroPageNeedsHeadInjection(Component)) {
-    head += chunkToString(result, maybeRenderHead());
-  }
-  try {
-    const destination = {
-      write(chunk) {
-        if (isPage && !result.partial && !renderedFirstPageChunk) {
-          renderedFirstPageChunk = true;
-          if (!/<!doctype html/i.test(String(chunk))) {
-            const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-            str += doctype + head;
-          }
-        }
-        if (chunk instanceof Response)
-          return;
-        str += chunkToString(result, chunk);
-      }
-    };
-    const renderInstance = await renderComponent(result, displayName, Component, props, slots);
-    await renderInstance.render(destination);
-  } catch (e) {
-    if (AstroError.is(e) && !e.loc) {
-      e.setLocation({
-        file: route?.component
-      });
-    }
-    throw e;
-  }
-  return str;
-}
-function nonAstroPageNeedsHeadInjection(pageComponent) {
-  return !!pageComponent?.[needsHeadRenderingSymbol];
-}
-
-const ClientOnlyPlaceholder = "astro-client-only";
-const hasTriedRenderComponentSymbol = Symbol("hasTriedRenderComponent");
-async function renderJSX(result, vnode) {
-  switch (true) {
-    case vnode instanceof HTMLString:
-      if (vnode.toString().trim() === "") {
-        return "";
-      }
-      return vnode;
-    case typeof vnode === "string":
-      return markHTMLString(escapeHTML(vnode));
-    case typeof vnode === "function":
-      return vnode;
-    case (!vnode && vnode !== 0):
-      return "";
-    case Array.isArray(vnode):
-      return markHTMLString(
-        (await Promise.all(vnode.map((v) => renderJSX(result, v)))).join("")
-      );
-  }
-  return renderJSXVNode(result, vnode);
-}
-async function renderJSXVNode(result, vnode) {
-  if (isVNode(vnode)) {
-    switch (true) {
-      case !vnode.type: {
-        throw new Error(`Unable to render ${result.pathname} because it contains an undefined Component!
-Did you forget to import the component or is it possible there is a typo?`);
-      }
-      case vnode.type === Symbol.for("astro:fragment"):
-        return renderJSX(result, vnode.props.children);
-      case vnode.type.isAstroComponentFactory: {
-        let props = {};
-        let slots = {};
-        for (const [key, value] of Object.entries(vnode.props ?? {})) {
-          if (key === "children" || value && typeof value === "object" && value["$$slot"]) {
-            slots[key === "children" ? "default" : key] = () => renderJSX(result, value);
-          } else {
-            props[key] = value;
-          }
-        }
-        const str = await renderToString(result, vnode.type, props, slots);
-        if (str instanceof Response) {
-          throw str;
-        }
-        const html = markHTMLString(str);
-        return html;
-      }
-      case (!vnode.type && vnode.type !== 0):
-        return "";
-      case (typeof vnode.type === "string" && vnode.type !== ClientOnlyPlaceholder):
-        return markHTMLString(await renderElement(result, vnode.type, vnode.props ?? {}));
-    }
-    if (vnode.type) {
-      let extractSlots2 = function(child) {
-        if (Array.isArray(child)) {
-          return child.map((c) => extractSlots2(c));
-        }
-        if (!isVNode(child)) {
-          _slots.default.push(child);
-          return;
-        }
-        if ("slot" in child.props) {
-          _slots[child.props.slot] = [..._slots[child.props.slot] ?? [], child];
-          delete child.props.slot;
-          return;
-        }
-        _slots.default.push(child);
-      };
-      if (typeof vnode.type === "function" && vnode.props["server:root"]) {
-        const output2 = await vnode.type(vnode.props ?? {});
-        return await renderJSX(result, output2);
-      }
-      if (typeof vnode.type === "function") {
-        if (vnode.props[hasTriedRenderComponentSymbol]) {
-          const output2 = await vnode.type(vnode.props ?? {});
-          if (output2?.[AstroJSX] || !output2) {
-            return await renderJSXVNode(result, output2);
-          } else {
-            return;
-          }
-        } else {
-          vnode.props[hasTriedRenderComponentSymbol] = true;
-        }
-      }
-      const { children = null, ...props } = vnode.props ?? {};
-      const _slots = {
-        default: []
-      };
-      extractSlots2(children);
-      for (const [key, value] of Object.entries(props)) {
-        if (value?.["$$slot"]) {
-          _slots[key] = value;
-          delete props[key];
-        }
-      }
-      const slotPromises = [];
-      const slots = {};
-      for (const [key, value] of Object.entries(_slots)) {
-        slotPromises.push(
-          renderJSX(result, value).then((output2) => {
-            if (output2.toString().trim().length === 0)
-              return;
-            slots[key] = () => output2;
-          })
-        );
-      }
-      await Promise.all(slotPromises);
-      let output;
-      if (vnode.type === ClientOnlyPlaceholder && vnode.props["client:only"]) {
-        output = await renderComponentToString(
-          result,
-          vnode.props["client:display-name"] ?? "",
-          null,
-          props,
-          slots
-        );
-      } else {
-        output = await renderComponentToString(
-          result,
-          typeof vnode.type === "function" ? vnode.type.name : vnode.type,
-          vnode.type,
-          props,
-          slots
-        );
-      }
-      return markHTMLString(output);
-    }
-  }
-  return markHTMLString(`${vnode}`);
-}
-async function renderElement(result, tag, { children, ...props }) {
-  return markHTMLString(
-    `<${tag}${spreadAttributes(props)}${markHTMLString(
-      (children == null || children == "") && voidElementNames.test(tag) ? `/>` : `>${children == null ? "" : await renderJSX(result, prerenderElementChildren(tag, children))}</${tag}>`
-    )}`
-  );
-}
-function prerenderElementChildren(tag, children) {
-  if (typeof children === "string" && (tag === "style" || tag === "script")) {
-    return markHTMLString(children);
-  } else {
-    return children;
-  }
-}
-
-async function renderPage(result, componentFactory, props, children, streaming, route) {
-  if (!isAstroComponentFactory(componentFactory)) {
-    result._metadata.headInTree = result.componentMetadata.get(componentFactory.moduleId)?.containsHead ?? false;
-    const pageProps = { ...props ?? {}, "server:root": true };
-    const str = await renderComponentToString(
-      result,
-      componentFactory.name,
-      componentFactory,
-      pageProps,
-      {},
-      true,
-      route
-    );
-    const bytes = encoder.encode(str);
-    return new Response(bytes, {
-      headers: new Headers([
-        ["Content-Type", "text/html; charset=utf-8"],
-        ["Content-Length", bytes.byteLength.toString()]
-      ])
-    });
-  }
-  result._metadata.headInTree = result.componentMetadata.get(componentFactory.moduleId)?.containsHead ?? false;
-  let body;
-  if (streaming) {
-    if (isNode && !isDeno) {
-      const nodeBody = await renderToAsyncIterable(
-        result,
-        componentFactory,
-        props,
-        children,
-        true,
-        route
-      );
-      body = nodeBody;
-    } else {
-      body = await renderToReadableStream(result, componentFactory, props, children, true, route);
-    }
-  } else {
-    body = await renderToString(result, componentFactory, props, children, true, route);
-  }
-  if (body instanceof Response)
-    return body;
-  const init = result.response;
-  const headers = new Headers(init.headers);
-  if (!streaming && typeof body === "string") {
-    body = encoder.encode(body);
-    headers.set("Content-Length", body.byteLength.toString());
-  }
-  if (route?.component.endsWith(".md")) {
-    headers.set("Content-Type", "text/html; charset=utf-8");
-  }
-  const response = new Response(body, { ...init, headers });
-  return response;
-}
 
 "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_".split("").reduce((v, c) => (v[c.charCodeAt(0)] = c, v), []);
 "-0123456789_".split("").reduce((v, c) => (v[c.charCodeAt(0)] = c, v), []);
 
-function spreadAttributes(values = {}, _name, { class: scopedClassName } = {}) {
-  let output = "";
-  if (scopedClassName) {
-    if (typeof values.class !== "undefined") {
-      values.class += ` ${scopedClassName}`;
-    } else if (typeof values["class:list"] !== "undefined") {
-      values["class:list"] = [values["class:list"], scopedClassName];
-    } else {
-      values.class = scopedClassName;
-    }
-  }
-  for (const [key, value] of Object.entries(values)) {
-    output += addAttribute(value, key, true);
-  }
-  return markHTMLString(output);
-}
-
-export { red as $, AstroError as A, chunkToString as B, isRenderInstruction as C, DEFAULT_404_COMPONENT as D, ExpectedImage as E, FailedToFetchRemoteImageDimensions as F, GetStaticPathsRequired as G, LocalsNotAnObject as H, IncompatibleDescriptorOptions as I, clientLocalsSymbol as J, clientAddressSymbol as K, LocalImageUsedWrongly as L, MissingImageDimension as M, NoMatchingStaticPathFound as N, ClientAddressNotAvailable as O, PageNumberParamNotFound as P, ASTRO_VERSION as Q, ROUTE_TYPE_HEADER as R, StaticClientAddressNotAvailable as S, responseSentSymbol as T, UnsupportedImageFormat as U, AstroResponseHeadersReassigned as V, renderPage as W, renderEndpoint as X, REROUTABLE_STATUS_CODES as Y, commonjsGlobal as Z, bold as _, UnsupportedImageConversion as a, yellow as a0, dim as a1, blue as a2, MissingSharp as b, InvalidImageService as c, ExpectedImageOptions as d, createComponent as e, ImageMissingAlt as f, addAttribute as g, createAstro as h, renderHead as i, renderSlot as j, renderComponent as k, REROUTE_DIRECTIVE_HEADER as l, maybeRenderHead as m, ResponseSentError as n, MiddlewareNoDataOrNextCalled as o, MiddlewareNotAResponse as p, InvalidGetStaticPathsReturn as q, renderTemplate as r, spreadAttributes as s, InvalidGetStaticPathsEntry as t, GetStaticPathsExpectedParams as u, GetStaticPathsInvalidRouteParam as v, PrerenderDynamicEndpointPathCollide as w, ReservedSlotName as x, renderSlotToString as y, renderJSX as z };
+export { addAttribute as a, renderHead as b, createComponent as c, renderSlot as d, createAstro as e, renderComponent as f, maybeRenderHead as m, renderTemplate as r };

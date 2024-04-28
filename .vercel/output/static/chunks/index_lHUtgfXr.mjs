@@ -1,6 +1,6 @@
 import { createClient } from '@sanity/client';
-import { e as createComponent, r as renderTemplate, g as addAttribute, i as renderHead, j as renderSlot, h as createAstro, m as maybeRenderHead, k as renderComponent } from '../astro_C6P1c0Jo.mjs';
-/* empty css                          */
+import { c as createComponent, r as renderTemplate, a as addAttribute, b as renderHead, d as renderSlot, e as createAstro, m as maybeRenderHead, f as renderComponent } from './astro/server_DxlnQ6y3.mjs';
+/* empty css                         */
 
 const sanityClient = createClient(
             {"apiVersion":"v2023-08-24"}
